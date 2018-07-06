@@ -3,7 +3,7 @@
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	id="WebApp_ID" version="3.0">
-	<display-name>taotao</display-name>
+	<display-name>taotao-manage-web</display-name>
 	<!--配置监听器 -->
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
@@ -15,7 +15,7 @@
 	</listener>
 	<!--配置前端控制器 -->
 	<servlet>
-		<servlet-name>taotao</servlet-name>
+		<servlet-name>taotao-manage-web</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
@@ -23,7 +23,7 @@
 		</init-param>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>taotao</servlet-name>
+		<servlet-name>taotao-manage-web</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
 

@@ -40,7 +40,7 @@ var TT = TAOTAO = {
 	},
 	// 格式化价格
 	formatPrice : function(val,row){
-		return (val/1000).toFixed(2);
+		return (val/100).toFixed(2);
 	},
 	// 格式化商品的状态
 	formatItemStatus : function formatStatus(val,row){
@@ -75,7 +75,7 @@ var TT = TAOTAO = {
         			}
         		}
         	}
-        	$(e).click(function(){
+        	$(e).unbind('click').click(function(){
         		var form = $(this).parentsUntil("form").parent("form");
         		KindEditor.editor(TT.kingEditorParams).loadPlugin('multiimage',function(){
         			var editor = this;
@@ -178,7 +178,44 @@ var TT = TAOTAO = {
     },
     
     changeItemParam : function(node,formId){
-    	$.getJSON("/rest/item/param/query/itemcatid/" + node.id,function(data){
+    	
+    	$.ajax({
+			type : "GET",
+			url : "/rest/item/param/" + node.id,
+			statusCode : {
+				200 : function(data) {
+					 $("#"+formId+" .params").show();
+					 var paramData = JSON.parse(data.paramData);
+					 var html = "<ul>";
+					 for(var i in paramData){
+						 var pd = paramData[i];
+						 html+="<li><table>";
+						 html+="<tr><td colspan=\"2\" class=\"group\">"+pd.group+"</td></tr>";
+						 
+						 for(var j in pd.params){
+							 var ps = pd.params[j];
+							 html+="<tr><td class=\"param\"><span>"+ps+"</span>: </td><td><input autocomplete=\"off\" type=\"text\"/></td></tr>";
+						 }
+						 
+						 html+="</li></table>";
+					 }
+					 html+= "</ul>";
+					 $("#"+formId+" .params td").eq(1).html(html);
+
+				},
+				404 : function() {
+					 $("#"+formId+" .params").hide();
+					 $("#"+formId+" .params td").eq(1).empty();
+				},
+				500 : function() {
+					$.messager.alert("提示", "出现未知错误");
+				}
+			}
+
+		});
+    	
+    	
+    	/*$.getJSON("/rest/item/param/query/itemcatid/" + node.id,function(data){
 			  if(data.status == 200 && data.data){
 				 $("#"+formId+" .params").show();
 				 var paramData = JSON.parse(data.data.paramData);
@@ -201,7 +238,7 @@ var TT = TAOTAO = {
 				 $("#"+formId+" .params").hide();
 				 $("#"+formId+" .params td").eq(1).empty();
 			  }
-		  });
+		  });*/
     },
     getSelectionsIds : function (select){
     	var list = $(select);
