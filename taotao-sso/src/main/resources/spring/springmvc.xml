@@ -22,7 +22,13 @@
 		base-package="com.taotao.sso.controller"></context:component-scan>
 
 	<mvc:annotation-driven validator="validator">
+		<mvc:message-converters>
+			<bean
+				class="org.springframework.http.converter.StringHttpMessageConverter">
+				<constructor-arg index="0" value="UTF-8"></constructor-arg>
+			</bean>
 
+		</mvc:message-converters>
 
 	</mvc:annotation-driven>
 

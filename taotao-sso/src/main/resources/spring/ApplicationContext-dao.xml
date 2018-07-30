@@ -16,17 +16,39 @@
 	<context:property-placeholder
 		location="classpath:db.properties,classpath:env.properties,classpath:redis.properties" />
 	<!-- 配制连接池 -->
-	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource">
-		<property name="driverClass" value="${jdbc.driver}"></property>
-		<property name="jdbcUrl" value="${jdbc.url}"></property>
-		<property name="username" value="${jdbc.username}"></property>
-		<property name="password" value="${jdbc.password}"></property>
+	<!-- 配置主库 -->
+	<bean id="materDataSource"
+		class="com.jolbox.bonecp.BoneCPDataSource">
+		<property name="driverClass" value="${jdbc.master.driver}"></property>
+		<property name="jdbcUrl" value="${jdbc.master.url}"></property>
+		<property name="username" value="${jdbc.master.username}"></property>
+		<property name="password" value="${jdbc.master.password}"></property>
 	</bean>
-	<!-- <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"> 
-		<property name="driverClass" value="${jdbc.driver}"></property> <property 
-		name="jdbcUrl" value="${jdbc.url}"></property> <property name="user" value="${jdbc.username}"></property> 
-		<property name="password" value="${jdbc.password}"></property> </bean> -->
-	<!-- 配置sqlsessionfactory -->
+	<!-- 配置从库数据源 -->
+	<bean id="slave01DataSource"
+		class="com.jolbox.bonecp.BoneCPDataSource">
+		<property name="driverClass" value="${jdbc.slave01.driver}"></property>
+		<property name="jdbcUrl" value="${jdbc.slave01.url}"></property>
+		<property name="username" value="${jdbc.slave01.username}"></property>
+		<property name="password" value="${jdbc.slave01.password}"></property>
+	</bean>
+	<!-- 定义动态数据源 -->
+	<bean id="dataSource"
+		class="com.taotao.common.dataSource.DynamicDataSource">
+		<!-- 设置多个数据源 -->
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="master" value-ref="materDataSource"></entry>
+				<entry key="slave" value-ref="slave01DataSource"></entry>
+			</map>
+		</property>
+		<!-- 设置默认数据源 -->
+
+		<property name="defaultTargetDataSource"
+			ref="materDataSource"></property>
+
+
+	</bean>
 	<bean id="sqlSessionFactory"
 		class="org.mybatis.spring.SqlSessionFactoryBean">
 

@@ -18,18 +18,24 @@
 	<!-- 配置通知 -->
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 	<tx:attributes>
+	<!-- query为只读 -->
 	<tx:method name="query*" read-only="true"/>
-	
+	<!-- 其他为默认 -->
 	<tx:method name="*" />
 	</tx:attributes>
 	
 	</tx:advice>
-	
+	<!-- 配置自定义切面处理器-->
+	<bean class="com.taotao.common.dataSource.DataSourceAspect" id="dataSourceAspect"></bean>
 	<aop:config>
-	<aop:advisor advice-ref="txAdvice" pointcut="execution(* com.taotao.manage.service.impl.*.*(..))"/>
-
+	<!-- <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.taotao.manage.service.impl.*.*(..))"/> -->
+	<aop:pointcut expression="execution(* com.taotao.manage.service.impl.*.*(..))" id="pointcut"/>
+	<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
+	<!-- 应用切面处理器 -->
+	<aop:aspect ref="dataSourceAspect" order="-9999">
+	<aop:before method="before" pointcut-ref="pointcut"/>
 	
-	
+	</aop:aspect>
 	</aop:config>
 	
 	

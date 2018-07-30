@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd"> <!-- bean definitions here -->
+	<!-- 对静态资源进行映射 -->
+	<!-- <mvc:resources location="/css/**" mapping="/css/"/> <mvc:resources 
+		location="/js/**" mapping="/js/"/> -->
+
+
+	<context:property-placeholder
+		location="classpath:env.properties" />
+	<context:component-scan
+		base-package="com.taotao.cart.controller"></context:component-scan>
+
+	<mvc:annotation-driven>
+	
+		<mvc:message-converters>
+
+			<bean
+				class="org.springframework.http.converter.StringHttpMessageConverter">
+				<constructor-arg index="0" value="UTF-8"></constructor-arg>
+			</bean>
+			<!-- 定义json转化器，支持json跨域 -->
+		<!-- 	<bean
+				class="com.taotao.common.spring.extend.converter.json.CallbackMappingJackson2HttpMessageConverter">
+				<property name="callbackName" value="callback"></property>
+			</bean> -->
+		</mvc:message-converters>
+
+	</mvc:annotation-driven>
+
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+
+		<property name="prefix" value="/WEB-INF/views/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!--配置拦截器  -->
+	<mvc:interceptors>
+	<mvc:interceptor>
+	<mvc:mapping path="/cart/**"/>
+	<bean class="com.taotao.cart.handlerInterceptor.UserLoginHandlerInterceptor"></bean>
+	</mvc:interceptor>
+	
+	</mvc:interceptors>
+ 
+
+</beans>

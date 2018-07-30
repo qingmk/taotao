@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+                http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd
+                http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd"> <!-- bean definitions here -->
+	<!-- 定义连接工厂 -->
+	<rabbit:connection-factory
+		id="connectionFactory" port="${rabbitmq.port}" host="${rabbitmq.host}"
+		username="${rabbitmq.username}" password="${rabbitmq.password}"
+		virtual-host="${rabbitmq.virtual-host}" />
+	<!-- 定义rabbit管理 -->
+	<rabbit:admin connection-factory="connectionFactory" />
+	<!-- 定义交换机 (通配符),不需要绑定关系，绑定通过界面绑定 -->
+	<rabbit:topic-exchange
+		name="taotao-item-exchange" id="taotao-item-exchange" auto-declare="true">
+		<!-- <rabbit:bindings>
+			<rabbit:binding pattern="item.#" queue="item"></rabbit:binding>
+		</rabbit:bindings> -->
+	</rabbit:topic-exchange>
+	<!-- 定义模板 -->
+	<rabbit:template id="rabbitmqTemplate" connection-factory="connectionFactory"
+		exchange="taotao-item-exchange"></rabbit:template>
+
+</beans>

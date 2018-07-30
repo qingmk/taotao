@@ -70,7 +70,7 @@ public class ItemController {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("查询商品分页");
 			}
-			PageInfo<Item> pageinfo = itemService.querPageyList(page, rows);
+			PageInfo<Item> pageinfo = itemService.queryPageyList(page, rows);
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("查询商品分页成功");
 			}

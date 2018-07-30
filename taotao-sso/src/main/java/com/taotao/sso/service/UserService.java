@@ -80,10 +80,22 @@ public class UserService {
 			return null;
 		}
 		//登录成功
-		String tooken=DigestUtils.md5Hex(System.currentTimeMillis()+username);
+		String token=DigestUtils.md5Hex(System.currentTimeMillis()+username);
 		//cookie存入缓存
-		this.redisService.set("TOKEN"+tooken,MAPPER.writeValueAsString(result), 60*30);
-		return tooken;
+		this.redisService.set("TOKEN"+token,MAPPER.writeValueAsString(result), 60*30);
+		return token;
+	}
+	public String queryUserByToken(String token) {
+	
+		String key="TOKEN"+token;
+		String jsonData=redisService.get(key);
+		if(StringUtils.isEmpty(jsonData)) {
+			return null;
+		}
+		//修改剩余时间
+		redisService.set(key, jsonData, 60*30);
+		return jsonData;
+		
 	}
 
 }

@@ -1,20 +1,22 @@
 package com.taotao.manage.service.impl;
 
-import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.ClientProtocolException;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.abel533.entity.Example;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.taotao.common.service.ApiService;
-import com.taotao.common.service.RedisService;
 import com.taotao.manage.mapper.ItemMapper;
 import com.taotao.manage.pojo.Item;
 import com.taotao.manage.pojo.ItemDesc;
@@ -29,10 +31,12 @@ public class ItemService extends BaseService<Item> {
 	private ItemParamItemService itemParamItemService;
 	@Value("${WEB_BASE_URL}")
 	private String WEB_BASE_URL;
+	
 	@Autowired
-	private ApiService apiService;
-	@Autowired
-	private RedisService redisService;
+	private RabbitTemplate rabbitTemplate;
+	
+	private final ObjectMapper MAPPER=new ObjectMapper();
+
 	/**
 	 * 保存商品数据
 	 * @param item 商品数据
@@ -59,7 +63,7 @@ public class ItemService extends BaseService<Item> {
 		itemParamItem.setParamData(itemParams);
 		itemParamItem.setItemId(item.getId());
 		this.itemParamItemService.save(itemParamItem);
-		
+		sendMessage(item.getId(), "insert");
 		
 	}
 	/**
@@ -68,7 +72,7 @@ public class ItemService extends BaseService<Item> {
 	 * @param rows
 	 * @return
 	 */
-	public PageInfo<Item>  querPageyList(Integer page, Integer rows) {
+	public PageInfo<Item>  queryPageyList(Integer page, Integer rows) {
 		PageHelper.startPage(page, rows);
 		
 		Example example = new Example(Item.class);
@@ -88,18 +92,25 @@ public class ItemService extends BaseService<Item> {
 		item.setCreated(null);
 		item.setUpdated(new Date());
 		super.updateSelect(item);
-		String url=WEB_BASE_URL+"item/cache/"+item.getId()+".html";
-		try {
-			apiService.doGet(url);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		ItemDesc itemDesc= new ItemDesc();
 		itemDesc.setItemId(item.getId());
 		itemDesc.setItemDesc(desc);
 		itemDesc.setUpdated(new Date());
 		this.itemDescService.updateSelect(itemDesc);
+		/**
+		 * 通知其他系统，商品已经更新
+		 * url:要通知的系统de路径
+		 * doget:通知其他系统的方法
+		 */
+		/*String url=WEB_BASE_URL+"item/cache/"+item.getId()+".html";
+		try {
+			apiService.doGet(url);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		sendMessage(item.getId(), "update");
 		/*ItemParamItem itemParamItem= new ItemParamItem();
 		itemParamItem.setParamData(itemParams);
 		itemParamItem.setId(item.getId());*/
@@ -107,6 +118,21 @@ public class ItemService extends BaseService<Item> {
 			return;
 		}
 		this.itemParamItemService.updateItemParamItem(item.getId(),itemParams);
+		
+	
+	
+	
 	}
+	private void sendMessage(Long itemId,String type) {
+		Map<String,Object> msg = new HashMap<>();
+		msg.put("itemId", itemId);
+		msg.put("type", type);
+		msg.put("date", System.currentTimeMillis());
+		try {
+			this.rabbitTemplate.convertAndSend("item."+type, MAPPER.writeValueAsString(msg));
+		} catch (Exception e) {
 
+			e.printStackTrace();
+		}
+	}
 }

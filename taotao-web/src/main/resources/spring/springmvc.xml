@@ -30,7 +30,17 @@
 		<property name="prefix" value="/WEB-INF/views/"></property>
 		<property name="suffix" value=".jsp"></property>
 	</bean>
-
+	<!-- 配置拦截器-->
+	
+	<mvc:interceptors>
+	<mvc:interceptor>
+	<mvc:mapping path="/order/**"/>
+	<bean class="com.taotao.web.handlerInterceptor.UserLoginHandlerInterceptor"></bean>
+	</mvc:interceptor>
+	
+	
+	
+	</mvc:interceptors>
 
 
 

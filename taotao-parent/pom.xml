@@ -27,7 +27,7 @@
 
 		<servlet-api.version>2.5</servlet-api.version>
 		<jsp-api.version>2.0</jsp-api.version>
-
+		<commons-rabbitmq.version>1.4.0.RELEASE</commons-rabbitmq.version>
 		<joda-time.version>2.5</joda-time.version>
 		<jedis.version>2.9.0</jedis.version>
 		<commons-lang3.version>3.3.2</commons-lang3.version>
@@ -102,7 +102,7 @@
 				<artifactId>mapper</artifactId>
 				<version>2.3.4</version>
 			</dependency>
-			
+
 			<!-- validation -->
 			<dependency>
 				<groupId>org.hibernate</groupId>
@@ -199,7 +199,12 @@
 				<artifactId>commons-codec</artifactId>
 				<version>${commons-codec.version}</version>
 			</dependency>
-
+			<!-- rabbitmq -->
+			<dependency>
+				<groupId>org.springframework.amqp</groupId>
+				<artifactId>spring-rabbit</artifactId>
+				<version>${commons-rabbitmq.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

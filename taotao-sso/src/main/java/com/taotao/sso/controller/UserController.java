@@ -149,12 +149,24 @@ public class UserController {
 	}
 	@RequestMapping(value="{token}",method=RequestMethod.GET)
 	@ResponseBody
-	public Map<String, Object> queryUserByToken(@PathVariable(value="token")String token){
-		Map<String, Object> result = new HashMap<>();
+	public ResponseEntity<String> queryUserByToken(@PathVariable(value="token")String token,@RequestParam(value="callback",required=false) String callback){
+		try {
+			String jsondata=this.userService.queryUserByToken(token);
+			if(null==jsondata) {
+				ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+			}else {
+				if(StringUtils.isEmpty(callback)) {
+					return ResponseEntity.ok().body(jsondata);
+				}
+				return ResponseEntity.ok().body(callback+"("+jsondata+");");
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
-		
-		return result;
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		
 	}
 }
